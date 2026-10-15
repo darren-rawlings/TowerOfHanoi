@@ -1,7 +1,7 @@
-using GameTemplate.Core;
+using TowerOfHanoi.Core;
 using Xunit;
 
-namespace GameTemplate.Tests;
+namespace TowerOfHanoi.Tests;
 
 public class ScoreboardTests
 {
