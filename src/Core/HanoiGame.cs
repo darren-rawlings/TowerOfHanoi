@@ -26,13 +26,6 @@ public sealed class HanoiGame
 			_pegs[0].Add(ring);
 	}
 
-	public static int RingsFor(Difficulty difficulty) => difficulty switch
-	{
-		Difficulty.Easy => 4,
-		Difficulty.Medium => 6,
-		_ => 8,
-	};
-
 	public int Rings { get; }
 
 	public int Moves => _history.Count;
@@ -85,6 +78,20 @@ public sealed class HanoiGame
 		if (IsSolved)
 			return null;
 		return Next(Rings, Target);
+	}
+
+	/// <summary>How many moves the perfect solution still needs from here (the minimum when nothing has moved).</summary>
+	public int MovesLeft => Left(Rings, Target);
+
+	private int Left(int ring, int target)
+	{
+		if (ring == 0)
+			return 0;
+		int at = PegOf(ring);
+		if (at == target)
+			return Left(ring - 1, target);
+		// Everything smaller to the spare peg, this ring across, then all of them back on top: 2^(ring-1) - 1.
+		return Left(ring - 1, 3 - at - target) + (1 << (ring - 1));
 	}
 
 	private (int From, int To)? Next(int ring, int target)

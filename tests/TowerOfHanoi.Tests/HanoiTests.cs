@@ -48,6 +48,24 @@ public class HanoiTests
 	}
 
 	[Fact]
+	public void MovesLeftCountsThePerfectFinishFromAnywhere()
+	{
+		var game = new HanoiGame(5);
+		Assert.Equal(31, game.MovesLeft);
+		game.Move(0, 2); game.Move(0, 1); game.Move(2, 1); game.Move(0, 2); game.Move(1, 0);
+		int expected = game.MovesLeft;
+		int made = 0;
+		while (game.NextBestMove() is { } move)
+		{
+			Assert.Equal(expected - made, game.MovesLeft);
+			game.Move(move.From, move.To);
+			made++;
+		}
+		Assert.Equal(expected, made);
+		Assert.Equal(0, game.MovesLeft);
+	}
+
+	[Fact]
 	public void UndoPutsTheRingBack()
 	{
 		var game = new HanoiGame(3);
