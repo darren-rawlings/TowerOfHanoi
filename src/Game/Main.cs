@@ -8,6 +8,7 @@ using Renegade.Core;
 using Renegade.Dev;
 using Renegade.Looks;
 using Renegade.Play;
+using Renegade.Store;
 using Renegade.Ui;
 using TowerOfHanoi.Core;
 
@@ -141,11 +142,11 @@ public partial class Main : Node3D
 		_solveButton = _hud.AddButton("", false, Control.LayoutPreset.BottomLeft, 20, 180, -110, -46, 22);
 		_solveButton.Pressed += OnSolvePressed;
 
-		// The 2ⁿ − 1 strip, under the top buttons, on its own layer so tutorial clips show it too.
+		// The 2ⁿ − 1 formula, under the top buttons, on its own layer so tutorial clips show it too.
 		var stripLayer = new CanvasLayer { Layer = 0 };
 		AddChild(stripLayer);
-		_strip = new MoveStrip(RingColours);
-		Widgets.Anchor(_strip, Control.LayoutPreset.TopWide, left: 40, right: -40, top: 214, bottom: 320);
+		_strip = new MoveStrip();
+		Widgets.Anchor(_strip, Control.LayoutPreset.TopWide, left: 40, right: -40, top: 214, bottom: 256);
 		stripLayer.AddChild(_strip);
 
 		_hud.BoardChosen += style =>
@@ -165,6 +166,8 @@ public partial class Main : Node3D
 		};
 
 		_spin = new SpinControl(_rig, () => !_busy && _lifted < 0 && !_settings.FreezeBoard);
+		// Freeze the board also turns it back to where it started.
+		_spin.Frozen = () => _settings.FreezeBoard && !_busy && _lifted < 0;
 		_spin.Tapped += OnTapped;
 		if (_clip != null)
 		{
@@ -505,6 +508,14 @@ public partial class Main : Node3D
 	{
 		if (!CanSolve)
 			return;
+		if (Shop.Current?.AdsRemoved == true)
+		{
+			// No ads to watch: just ask, then solve.
+			_hud.Dialog("Solve it for you?", "The computer finishes the puzzle from here.",
+				("Solve it", true, () => _ = AutoSolve()),
+				("Not now", false, null));
+			return;
+		}
 		int ads = SolveAds(_game.Rings);
 		string watch = ads == 1 ? "Watch a short ad" : $"Watch {ads} short ads";
 		_hud.Dialog("Solve it for you?", $"{watch} and the computer finishes the puzzle from here. Bigger towers take more ads.",
@@ -578,7 +589,7 @@ public partial class Main : Node3D
 	private async Task PlayClip(string clip)
 	{
 		// The clip is square: the strip goes to the very top, clear of the pegs.
-		Widgets.Anchor(_strip, Control.LayoutPreset.TopWide, left: 40, right: -40, top: 16, bottom: 120);
+		Widgets.Anchor(_strip, Control.LayoutPreset.TopWide, left: 40, right: -40, top: 16, bottom: 58);
 		_settings.Muted = false;
 		RingCount = clip switch { "move" => 4, "solve" => 3, "auto8" => 8, _ => 6 };
 		StartGame();
@@ -634,14 +645,14 @@ public partial class Main : Node3D
 	private void RefreshUi()
 	{
 		_hud.SetScore($"{_game.Rings} rings   ·   moves {_game.Moves}");
-		_strip.Set(_game.Rings, _game.Moves);
+		_strip.Set(_game.Rings);
 		_hud.SetNewGameVisible(_game.IsSolved && !_busy);
 		_hud.SetUndoVisible(CanHint);
 		_hud.SetRestartVisible(!_game.IsSolved);
 		_ringsButton.Text = $"Rings: {RingCount}";
 		_ringsButton.Disabled = _solving;
 		int ads = SolveAds(_game.Rings);
-		_solveButton.Text = ads == 1 ? "Solve (ad)" : $"Solve ({ads} ads)";
+		_solveButton.Text = ShopRows.AdText(ads == 1 ? "Solve (ad)" : $"Solve ({ads} ads)");
 		_solveButton.Visible = CanSolve;
 		if (_game.IsSolved)
 		{

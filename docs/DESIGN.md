@@ -16,9 +16,8 @@ for the fewest moves, two within half as many again, otherwise one.
 - **Signature effect, the finale:** the finished tower lights up ring by ring from the bottom,
   each with a note a step higher, then a fountain of sparks, and (if you solved it yourself) the
   tower catches fire.
-- **The move strip** under the top buttons draws the perfect solution: one bar per move, 2ⁿ − 1
-  of them, as tall as the ring that moves (the ruler pattern: the biggest ring once in the middle,
-  two copies of the smaller solution either side). Bars light up as you move.
+- **The formula** under the top buttons: "Fewest moves: 2ⁿ − 1 = 31". (A strip of bars, one per
+  move of the perfect solution, was tried and removed: it gave the solution away.)
 - Drag sideways to spin the board.
 
 ## Ads
