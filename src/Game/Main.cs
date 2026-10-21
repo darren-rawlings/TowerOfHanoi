@@ -25,7 +25,9 @@ public partial class Main : Node3D
 	public const string Title = "Tower of Hanoi";
 
 	/// <summary>Google's test ad units until the real ones exist in AdMob (see the release playbook).</summary>
-	private static readonly AdMobConfig AdUnits = AdMobConfig.Test;
+	private static readonly AdMobConfig AdUnits = new(
+		InterstitialUnitId: "ca-app-pub-3310172999423635/5374749559",
+		RewardedUnitId: "ca-app-pub-3310172999423635/1435504544");
 
 	private const float PegSpacing = 2.9f;
 	private const float RingHeight = 0.3f;
